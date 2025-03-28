@@ -15,7 +15,7 @@ GECKODRIVER_LOCATION = config.get("DEFAULT", "GECKODRIVER_LOCATION")
 USERNAME = config.get("DEFAULT", "USERNAME")
 PASSWORD = config.get("DEFAULT", "PASSWORD")
 PUBLICO_GERAL = config.get("DEFAULT", "PUBLICO_GERAL", fallback=False)
-UNIDADES_SELECIONADAS = config.get("DEFAULT", "UNIDADES_SELECIONADAS").split(",") if config.get("DEFAULT", "UNIDADES_SELECIONADAS") else []
+UNIDADES_SELECIONADAS = [u.strip() for u in config.get("DEFAULT", "UNIDADES_SELECIONADAS").split(",")] if config.get("DEFAULT", "UNIDADES_SELECIONADAS") else []
 
 # Configuração do navegador Firefox
 options = webdriver.FirefoxOptions()
@@ -103,8 +103,7 @@ try:
         time.sleep(1)    
 
     for unidade in unidades_selecionadas:
-        try:
-            unidade = unidade.strip()
+        try:           
             elemento = driver.find_element(By.XPATH, f"//li[contains(., '{unidade}')]")
             elemento.click()
             print(f"✅ Selecionado: {unidade}")
@@ -124,10 +123,10 @@ try:
             unidade_element = atividade.find_element(By.XPATH, ".//div[contains(text(), 'Sesc')]")
             unidade = unidade_element.text.replace('Sesc','').strip()
 
-            # Verificar se é uma unidade que estamos monitorando
-            if any(u in unidade for u in unidades_selecionadas):
+            # Verificar se é uma unidade que estamos monitorando (Ultima palavra do nome da unidade)
+            if any(u.split()[-1] in unidade for u in unidades_selecionadas):
                 # Procurar pelo botão "INSCREVER" dentro da atividade
-                botao_inscrever = atividade.find_elements(By.XPATH, ".//span[contains(text(), 'Inscrever')]")
+                botao_inscrever = atividade.find_elements(By.XPATH, ".//span[contains(text(), 'Inscrever')]")                
                 
                 if botao_inscrever:
                     unidades_com_vagas.append(unidade)                    
